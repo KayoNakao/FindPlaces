@@ -19,7 +19,7 @@ class KeywordButton: UIButton {
     }
     
     func configure() {
-        setTitleColor(.tintColor, for: .selected)
+        setTitleColor(.primaryOrange, for: .selected)
         setTitleColor(.label, for: .normal)
         titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
     }
