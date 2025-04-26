@@ -10,6 +10,17 @@ import SnapKit
 
 class HomeViewController: BaseViewController {
 
+    private var viewModel: HomeViewModel
+    
+    init(viewModel: HomeViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     private lazy var keywordScrollView = {
         let scrollView = UIScrollView()
         scrollView.isScrollEnabled = true
@@ -49,6 +60,7 @@ class HomeViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureLayout()
+        updatePlaces(keyword: Keyword.cafe)
     }
     
     func configureLayout() {
@@ -88,20 +100,34 @@ class HomeViewController: BaseViewController {
             guard let keywordButton = button as? UIButton else { return }
             keywordButton.isSelected = button.tag == sender.tag
         }
+        guard let keyword = Keyword(rawValue: sender.tag) else { return }
+        updatePlaces(keyword: keyword)
+    }
+    
+    func updatePlaces(keyword: Keyword) {
+        Task {
+            do {
+                try await viewModel.getPlaces(for: keyword)
+                placeTableView.reloadData()
+            } catch {
+                presentErrorAlert(title: Constants.errorTitle, message: Constants.errorMessage)
+            }
+        }
     }
 }
 
 extension HomeViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        1
+        viewModel.places.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: PlaceTableViewCell.identifier, for: indexPath) as? PlaceTableViewCell else {
             return UITableViewCell()
         }
+        let place = viewModel.places[indexPath.row]
+        let photoMedia = viewModel.photoMedias[place.id]
+        cell.configure(place: place, urlString: photoMedia?.photoUri)
         return cell
     }
-    
-    
 }
