@@ -60,7 +60,13 @@ class HomeViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureLayout()
-        updatePlaces(keyword: Keyword.cafe)
+        
+        viewModel.onPlacesUpdate = { [weak self] in
+            DispatchQueue.main.async {
+                self?.updateKeywordButton(for: self?.viewModel.currentKeyword.rawValue ?? 0)
+                self?.placeTableView.reloadData()
+            }
+        }
     }
     
     func configureLayout() {
@@ -95,13 +101,18 @@ class HomeViewController: BaseViewController {
         }
     }
     
-    @objc func didTapKeyword(_ sender: UIButton) {
+    func updateKeywordButton(for tag: Int) {
         keyWordButtonStackView.arrangedSubviews.forEach { button in
             guard let keywordButton = button as? UIButton else { return }
-            keywordButton.isSelected = button.tag == sender.tag
+            keywordButton.isSelected = button.tag == tag
         }
+    }
+    
+    @objc func didTapKeyword(_ sender: UIButton) {
+        updateKeywordButton(for: sender.tag)
         guard let keyword = Keyword(rawValue: sender.tag) else { return }
         updatePlaces(keyword: keyword)
+        viewModel.currentKeyword = keyword
     }
     
     func updatePlaces(keyword: Keyword) {

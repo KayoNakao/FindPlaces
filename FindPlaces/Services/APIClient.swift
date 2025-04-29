@@ -105,9 +105,7 @@ class APIClient {
             print("Invalid URL")
             return nil
         }
-        
-        print(url)
-        
+                
         var request = URLRequest(url: url)
         request.httpMethod = Constants.get
         return request

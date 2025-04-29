@@ -16,6 +16,7 @@ class HomeViewModel: NSObject {
     var currentKeyword: Keyword = .cafe
     var places: [PlaceDetail] = []
     var photoMedias: [String: PhotoMedia] = [:]
+    var onPlacesUpdate: (() -> Void)?
     
     override init() {
         super.init()
@@ -84,6 +85,7 @@ extension HomeViewModel: CLLocationManagerDelegate {
         currentLocation = location
         Task {
             try? await getPlaces(for: currentKeyword)
+            onPlacesUpdate?()
         }
     }
     

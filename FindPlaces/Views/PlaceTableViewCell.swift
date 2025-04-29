@@ -84,21 +84,21 @@ class PlaceTableViewCell: UITableViewCell {
             make.leading.equalToSuperview().offset(10)
             make.centerY.equalToSuperview()
             make.width.height.equalTo(80)
-            make.top.bottom.greaterThanOrEqualTo(10)
         }
         
         container.addSubview(ratingLabel)
         ratingLabel.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().offset(-10)
-            make.width.lessThanOrEqualTo(50)
+            make.width.equalTo(50)
         }
         
         container.addSubview(labelStackView)
         labelStackView.snp.makeConstraints { make in
-            make.top.bottom.greaterThanOrEqualToSuperview().inset(15)
+            make.top.bottom.greaterThanOrEqualToSuperview().inset(10)
+            make.centerY.equalTo(placeImageView.snp.centerY)
             make.leading.equalTo(placeImageView.snp.trailing).offset(10)
-            make.trailing.lessThanOrEqualTo(ratingLabel.snp.leading).offset(-15)
+            make.trailing.equalTo(ratingLabel.snp.leading).offset(-10)
         }
         
         labelStackView.addArrangedSubview(nameLabel)
