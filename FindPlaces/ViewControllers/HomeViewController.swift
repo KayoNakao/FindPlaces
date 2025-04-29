@@ -8,9 +8,14 @@
 import UIKit
 import SnapKit
 
+protocol HomeViewControllerDelegate: AnyObject {
+    func showDetailViewController(with place: PlaceDetail, photoUrl: String)
+}
+
 class HomeViewController: BaseViewController {
 
     private var viewModel: HomeViewModel
+    weak var delegate: HomeViewControllerDelegate?
     
     init(viewModel: HomeViewModel) {
         self.viewModel = viewModel
@@ -51,6 +56,7 @@ class HomeViewController: BaseViewController {
     private lazy var placeTableView = {
         let tableView = UITableView()
         tableView.dataSource = self
+        tableView.delegate = self
         tableView.separatorStyle = .none
         tableView.backgroundColor = .systemGroupedBackground
         tableView.register(PlaceTableViewCell.self, forCellReuseIdentifier: PlaceTableViewCell.identifier)
@@ -140,5 +146,14 @@ extension HomeViewController: UITableViewDataSource {
         let photoMedia = viewModel.photoMedias[place.id]
         cell.configure(place: place, urlString: photoMedia?.photoUri)
         return cell
+    }
+}
+
+extension HomeViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let place = viewModel.places[indexPath.row]
+        let photoMedia = viewModel.photoMedias[place.id]
+        delegate?.showDetailViewController(with: place, photoUrl: photoMedia?.photoUri ?? "")
     }
 }

@@ -22,10 +22,19 @@ class HomeCoordinator: RootViewCoordinator {
     private lazy var navigationController: UINavigationController = {
         let viewModel = HomeViewModel()
         let homeVC = HomeViewController(viewModel: viewModel)
+        homeVC.delegate = self
         let navigationController = UINavigationController(rootViewController: homeVC)
         return navigationController
     }()
     
     func start() {}
+    
+}
+
+extension HomeCoordinator: HomeViewControllerDelegate {
+    func showDetailViewController(with place: PlaceDetail, photoUrl: String) {
+        let detailVC = DetailViewController(with: place, photoUrl: photoUrl)
+        navigationController.pushViewController(detailVC, animated: true)
+    }
     
 }
