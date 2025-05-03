@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Add your Field Mask here to rettive your desire info from Places API
 enum PlaceField: String, CaseIterable {
     case id = "places.id"
     case displayName = "places.displayName"

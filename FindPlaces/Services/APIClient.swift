@@ -78,7 +78,7 @@ class APIClient {
         
         let payload = PostRequestPayload(
             includedTypes: [keyword],
-            maxResultCount: 3,
+            maxResultCount: 3, //Change here to get more result
             locationRestriction: LocationRestriction(
                 circle: Circle(
                     center: Center(
