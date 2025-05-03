@@ -31,6 +31,7 @@ class HomeViewModel: NSObject {
             self.places = result.places
             photoMedias = try await getPhotos()
         } catch {
+            self.places = []
             print(#function, error.localizedDescription)
             throw error
         }

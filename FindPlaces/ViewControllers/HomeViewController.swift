@@ -63,6 +63,31 @@ class HomeViewController: BaseViewController {
         return tableView
     }()
     
+    private lazy var emptyStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 10
+        return stackView
+    }()
+
+    private lazy var emptyIconImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(systemName: "magnifyingglass")?.withRenderingMode(.alwaysTemplate)
+        imageView.tintColor = .primaryOrange
+        return imageView
+    }()
+    
+    private lazy var emptyTextLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Ooops!\nNo places are found around you for this category."
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.font = .systemFont(ofSize: 18)
+        label.textColor = .label
+        return label
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureLayout()
@@ -70,6 +95,7 @@ class HomeViewController: BaseViewController {
         viewModel.onPlacesUpdate = { [weak self] in
             DispatchQueue.main.async {
                 self?.updateKeywordButton(for: self?.viewModel.currentKeyword.rawValue ?? 0)
+                self?.emptyStackView.isHidden = !(self?.viewModel.places.isEmpty ?? false)
                 self?.placeTableView.reloadData()
             }
         }
@@ -105,6 +131,15 @@ class HomeViewController: BaseViewController {
             make.top.equalTo(keywordScrollView.snp.bottom)
             make.bottom.equalTo(view.snp.bottomMargin)
         }
+        
+        placeTableView.addSubview(emptyStackView)
+        emptyStackView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.leading.trailing.equalToSuperview().inset(45)
+        }
+        
+        emptyStackView.addArrangedSubview(emptyIconImageView)
+        emptyStackView.addArrangedSubview(emptyTextLabel)
     }
     
     func updateKeywordButton(for tag: Int) {
@@ -115,8 +150,10 @@ class HomeViewController: BaseViewController {
     }
     
     @objc func didTapKeyword(_ sender: UIButton) {
+        guard let keyword = Keyword(rawValue: sender.tag),
+            viewModel.currentKeyword != keyword else { return }
+        
         updateKeywordButton(for: sender.tag)
-        guard let keyword = Keyword(rawValue: sender.tag) else { return }
         updatePlaces(keyword: keyword)
         viewModel.currentKeyword = keyword
     }
@@ -124,10 +161,15 @@ class HomeViewController: BaseViewController {
     func updatePlaces(keyword: Keyword) {
         Task {
             do {
+                showLoadingView()
                 try await viewModel.getPlaces(for: keyword)
+                emptyStackView.isHidden = !viewModel.places.isEmpty
                 placeTableView.reloadData()
+                removeLoadingView()
             } catch {
-                presentErrorAlert(title: Constants.errorTitle, message: Constants.errorMessage)
+                self.emptyStackView.isHidden = !self.viewModel.places.isEmpty
+                self.placeTableView.reloadData()
+                removeLoadingView()
             }
         }
     }

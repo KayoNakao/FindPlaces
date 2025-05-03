@@ -50,7 +50,7 @@ class PlaceTableViewCell: UITableViewCell {
         label.text = "15 Sunset street, Sunrise Ave, Mont-Royal, Montreal"
         label.font = .systemFont(ofSize: 15)
         label.textColor = .label
-        label.numberOfLines = 0
+        label.numberOfLines = 2
         return label
     }()
     
